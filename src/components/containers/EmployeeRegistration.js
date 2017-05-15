@@ -62,9 +62,11 @@ submitEmployee(event){
        alert('Error while saving employee into DB, ERROR : '+err);
        return;
      }
+     let emptyEmp = {};
      console.log(JSON.stringify(response.body));
      this.setState({
-       employees:updatedEmployees
+       employees: updatedEmployees,
+       employee: emptyEmp
      })
    });
 }
@@ -88,8 +90,10 @@ getEmployeeById(inputId){
   return employeeById;
 }
   render(){
+    let sNo = 1;
     const employeeList = this.state.employees.map((employee, i)=>{
       return <tr key = {i}>
+        <td>{sNo++}</td>
           <td>{employee.name}</td>
           <td>{employee.employeeId}</td>
           <td>{employee.email}</td>
@@ -103,7 +107,7 @@ getEmployeeById(inputId){
       <div>
       <div className="panel panel-default">
         <div className="panel-heading text-center">
-          <span className="lead">User Registration Form </span>
+          <span className="lead">Employee Registration Form </span>
         </div>
         <div className = "panel-body">
            <div className="form-horizontal">
@@ -150,11 +154,12 @@ getEmployeeById(inputId){
             </div>
         </div>
         <div className="panel panel-default">
-              <div className="panel-heading text-center"><span className="lead">List of Users </span></div>
+              <div className="panel-heading text-center"><span className="lead">List of Employee </span></div>
               <div className="tablecontainer">
                   <table className="table table-hover">
                       <thead>
                           <tr>
+                              <th>S.No.</th>
                               <th>Name</th>
                               <th>Employee ID</th>
                               <th>Email</th>
