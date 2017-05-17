@@ -10,19 +10,28 @@ class EmployeeRegistration extends React.Component{
         name:'',
         employeeId: '',
         email: '',
-        address: ''
+        address: '',
       },
       employees:[
-      /*  {_id: 1, name: 'Pradeep', employeeId: 38860, email: 'pradeep@gmail.com', address: 'Gurgaon'},
-        {_id: 2, name: 'Susil', employeeId: 38861, email: 'susil@gmail.com', address: 'Orissa'},
-        {_id: 3, name: 'Saurav', employeeId: 38862, email: 'saurav@gmail.com', address: 'Lucknow'}*/
-      ]
+      ],
+      blankEmployee: {
+           name:'',
+           employeeId: '',
+           email: '',
+           address: ''
+         },
+        blankEmployees:[]
     }
 
   }
 
 componentDidMount(){
   console.log("EmployeeRegistration:componentDidMount()");
+  this.getAllEmployee();
+}
+
+getAllEmployee(){
+  console.log("EmployeeRegistration:getAllEmployee()");
   superagent
   .get('/api/employee')
   .query(null)
@@ -50,44 +59,118 @@ updateEmployee(event){
   })
 }
 submitEmployee(event){
-  console.log("EmployeeRegistration:submitEmployee updatedEmployee = "+JSON.stringify(this.state.employee));
-  let updatedEmployees = Object.assign([], this.state.employees);
-   updatedEmployees.push(this.state.employee);
+  let employee = this.state.employee;
+  console.log("EmployeeRegistration:submitEmployee updatedEmployee = "+JSON.stringify(employee));
+ if(!employee._id){
+  this.save(employee);
+  }
+  else{
+    this.update(employee);
+  }
+   this.setState({
+    employee: this.state.blankEmployee
+  })
+}
+
+update(updatedEmployee){
+ superagent
+  .put('/api/employee')
+  .set('Accept', 'application/json')
+  .send(updatedEmployee)
+  .end((err, response)=>{
+    if(response.body.confirmation == 'fail'){
+      alert('Error while updating employee into DB, ERROR : '+err);
+      return;
+    }
+    console.log("EmployeeRegistration:update: employee updated successfuly!! response = "+JSON.stringify(response));
+
+    let clonedEmp = Object.assign([], this.state.employees);
+    clonedEmp.map((employee, i)=>{
+      if(employee._id == updatedEmployee._id){
+        employee['_id'] = response.body.results._id;
+        employee['employeeId'] = updatedEmployee.employeeId;
+        employee['name'] = updatedEmployee.name;
+        employee['address'] = updatedEmployee.address;
+        employee['email'] = updatedEmployee.email;
+      }
+    });
+
+    this.setState({
+      employees: clonedEmp
+    })
+  });
+}
+
+save(newEmployee){
+  superagent
+  .post('/api/employee')
+  .set('Accept', 'application/json')
+  .send(newEmployee)
+  .end((err, response)=>{
+    if(response.body.confirmation == 'fail'){
+      alert('Error while saving employee into DB, ERROR : '+err);
+      return;
+    }
+    console.log("EmployeeRegistration:save: employee added successfuly!!");
+    let updatedEmployees = Object.assign([], this.state.employees);
+    updatedEmployees.push(response.body.results);
+    this.setState({
+      employees: updatedEmployees
+    })
+  });
+}
+deleteEmployee(event){
+  let employeeId = event.target.value;
+  console.log("EmployeeRegistration:deleteEmployee for employeeId = "+employeeId);
    superagent
-   .post('/api/employee')
-   .set('Accept', 'application/json')
-   .send(this.state.employee)
+   .del('/api/employee/'+employeeId)
+   .accept('application/json')
    .end((err, response)=>{
-     if(err){
-       alert('Error while saving employee into DB, ERROR : '+err);
+     if(response.body.confirmation == 'fail'){
+       alert('Error while deleting employee from DB, ERROR : '+err);
        return;
      }
-     let emptyEmp = {};
-     console.log(JSON.stringify(response.body));
+     console.log('EmployeeRegistration:deleteEmployee : employee got deleted successfully');
+     //reload data
+     let clonedEmp = Object.assign([], this.state.employees);
+     let deletedIndex = -1;
+     clonedEmp.map((employee, i)=>{
+       if(employee._id == response.body.results._id){
+         deletedIndex = i;
+       }
+     });
+     console.log('EmployeeRegistration:deleteEmployee : clonedEmp = '+JSON.stringify(clonedEmp)+", deletedIndex = "+deletedIndex);
+     clonedEmp.splice(deletedIndex, 1);
      this.setState({
-       employees: updatedEmployees,
-       employee: emptyEmp
-     })
+       employees: clonedEmp
+     });
    });
 }
 
 editEmployee(event){
-  console.log("EmployeeRegistration:editEmployee got called for employee with _id "+event.target.value);
+  console.log("EmployeeRegistration:editEmployee got called for employee:  "+JSON.stringify(event.target.value));
   let employee = this.getEmployeeById(event.target.value);
   console.log('employee = '+JSON.stringify(employee));
-  /*this.setState({
-  employee: employeeById
-})*/
+  this.setState({
+  employee: employee
+})
 }
 
 getEmployeeById(inputId){
   let employeeList = Object.assign([], this.state.employees);
-  let employeeById = this.state.employees.map((employee)=>{
-    if(employee._id == inputId){
-      return employee;
+  let employeeById = {};
+  employeeList.map((employee)=>{
+    if(employee.employeeId == inputId){
+      employeeById = employee;
     }
   });
   return employeeById;
+}
+
+resetForm(){
+  this.setState({
+    employee: this.state.blankEmployee
+  })
 }
   render(){
     let sNo = 1;
@@ -99,7 +182,7 @@ getEmployeeById(inputId){
           <td>{employee.email}</td>
           <td>{employee.address}</td>
           <td>
-           <button type="button" className="btn btn-success custom-width" value = {employee._id} onClick = {this.editEmployee.bind(this)} >Edit</button>  <button type="button" className="btn btn-danger custom-width">Remove</button>
+           <button type="button" className="btn btn-success custom-width" value = {employee.employeeId} onClick = {this.editEmployee.bind(this)} >Edit</button>  <button type="button" value = {employee.employeeId} onClick = {this.deleteEmployee.bind(this)} className="btn btn-danger custom-width">Remove</button>
           </td>
         </tr>;
     });
@@ -147,7 +230,7 @@ getEmployeeById(inputId){
                         <div className = "col-md-7"></div>
                         <div className="form-actions floatRight col-md-5">
                             <input type="submit" onClick = {this.submitEmployee.bind(this)} value={!this.state.employee._id ? 'Add' : 'Update'} className="btn btn-primary btn-sm"/>
-                            <button type="button" className="btn btn-warning btn-sm">Reset Form</button>
+                            <button type="button" onClick = {this.resetForm.bind(this)} className="btn btn-warning btn-sm">Reset Form</button>
                         </div>
                     </div>
               </div>
