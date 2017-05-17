@@ -24,6 +24,4 @@ DB_CONNECTION_SUCCESS: mongodb://localhost/react-node-rest-mongo-db
 Access url of application: 
 http://localhost:3000/
 
-### Note: for now only add and display functionality is working, it will soon updated with update and delete functionlaity.  
-
 ### Questions and Comments: pradeepk.pdp@gmail.com
