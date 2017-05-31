@@ -8,8 +8,9 @@ A sample application to get started with React Js, Node js, express js, RESTful 
 ## How to Run
 
 * Clone this repository .
-* Build the project by executing ```npm install``` from the root directory of application.
-* After successfull build, start the server by executing ```nodemon``` as below : 
+* Download the dependency by executing ```npm install``` from the root directory of application.
+* Build the project by executing ```webpack``` from the root directory of application.
+* After successfull build, start the server by executing ```nodemon``` as below :
 
 ```
 C:\My_Data\COP\git\react-node-rest-mongo-app>nodemon
