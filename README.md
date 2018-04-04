@@ -1,6 +1,7 @@
 # React Js with Node js, express js, RESTful and Mongo DB 
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/pradeep0601/react-node-rest-mongo-app.svg)](https://greenkeeper.io/)
+[![Build Status](https://travis-ci.org/pradeep0601/react-node-rest-mongo-app.svg?branch=master)](https://travis-ci.org/pradeep0601/react-node-rest-mongo-app)
 
 A sample application to get started with React Js, Node js, express js, RESTful and Mongo DB .
 ## Prerequisites:  
