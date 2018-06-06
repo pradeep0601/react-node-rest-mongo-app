@@ -17,7 +17,7 @@
     "react-dom": "^16.3.0",
     "serve-favicon": "~2.5.0",
     "superagent": "^3.5.2",
-    "webpack": "^4.4.1",
+    "webpack": "^4.11.1",
     "webdriverio": "^4.8.0",
     "lodash": "^3.0.0"
   },
